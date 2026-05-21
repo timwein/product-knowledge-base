@@ -63,6 +63,11 @@ one of:**
     reader is too coupled to the single-user/tweet model to retrofit
     cleanly. Slowest, only if A and B are both bad.
 
+**Resolved (session 2):** none of A/B/C. The existing reader stays
+untouched as Tim's personal reader; Sentinel builds a separate
+multi-tenant reader from scratch in `sentinel/web/`. See §"Locked
+decisions (session 2)".
+
 ## Product summary
 
 Sentinel is a personal blog knowledge base. A user signs up, picks
@@ -256,6 +261,94 @@ Once those are read, the next session should:
   (Tim said verbatim is fine for now; flagging in case it should be
   revisited after seeing real onboarding feel.)
 - Domain / brand: "Sentinel" is the working name. Final?
+- Anthropic API key: use Tim's existing one or provision a new one
+  scoped to Sentinel for cost attribution?
+
+## Locked decisions (session 2)
+
+Decisions made in the read-the-source-repos session after the three source
+repos (`blog-ingestion-agent`, `tweet-knowledge-base`,
+`saved-tweet-ingestion-agent`) were read in full. These resolve the open
+questions raised in the v0.1 spec.
+
+### Multi-tenancy
+
+**Single global Managed Agent + per-user inputs.** Keep one `agent_id`.
+Genericize the existing `kb-blog-curator.system.md` system prompt: replace
+hard-coded "Tim Weingarten" / interest-list strings with a
+`<user_display_name>` and `<user_interests>` block injected at session
+kickoff. Pass per-user seed files (subscriptions, pinned sources, recent
+signals) at session creation via the Files API and `resources` param. Do
+not fork the agent per signup.
+
+Schema impact:
+
+- `tim_score` is removed from the `posts.structured_analysis` YAML and
+  becomes `user_post_scores.score` (the per-user join table already in
+  the data model). The agent emits `relevance_score` only; user ratings
+  live per-user.
+- The agent's profile state — `deltas.md`, `evolution.md`, `feedback.md`,
+  `discovered_sources.md`, `pinned_sources.md`, `feed_map.json` — becomes
+  per-user. See "Storage transport" below for how it materializes.
+
+### Reader app
+
+**Leave `tweet-knowledge-base/reader/` untouched.** It stays Tim's
+personal reader against his existing single-user KB. Build the Sentinel
+multi-tenant reader from scratch in `sentinel/web/` in this repo
+(`product-knowledge-base`). The existing reader can be read for
+inspiration — do not import its code unless a specific component
+(rendering an analysis Markdown file, the rating UI, etc.) pays off and
+is cleanly extractable.
+
+### Backfill
+
+**Port all 468 existing blog analyses verbatim** as backfill for new
+Sentinel users at signup. Same scores, same blurbs, same structured
+analyses for everyone on day one. New posts ingested after signup are
+scored per-user.
+
+**Filter rule.** Drop any analysis that touches Tim's personal financial
+exposure: his Anthropic equity, his stake or portfolio, Anthropic's
+valuation discussed in a personal-investment context. Analyses of
+Anthropic's public strategy, research, platform, or model releases stay
+— that's public commentary and is the seed corpus's value.
+
+**Process.** Before backfill ships, scan all 468 `blog-*.md` files in
+`tweet-knowledge-base/2026/**/` for personal-finance mentions and surface
+a candidate-drop list to Tim for eyeball review. No silent heuristic
+filter — Tim reviews and approves the drop list.
+
+### Storage transport (agent → DB)
+
+**Shared staging git repo + sync worker.** The Managed Agent commits
+analyses to a Sentinel-controlled staging git repo (user_id embedded in
+path prefix, e.g. `users/<user_id>/2026/MM/DD/blog-*.md`), using the same
+incremental-commit pattern the existing system prompt already encodes —
+one analysis = one commit+push. A Python sync worker on the Sentinel
+curator service watches the staging repo, parses Markdown + YAML for new
+commits, and upserts into Postgres (`posts`, `user_post_scores`).
+
+The per-user profile state (deltas, evolution, discovered_sources,
+feedback, feed_map, pinned_sources) also lives in this staging repo
+namespaced per user. The sync worker mirrors it into the corresponding
+per-user Postgres rows (or back into the repo when the agent needs to
+read it — TBD which direction is canonical, decide during M2).
+
+This minimizes the rewrite to the existing system prompt: file paths
+change (add user_id prefix), the remote URL changes, but the file-
+discipline / incremental-commit / dedupe-log machinery is preserved.
+
+### Resolved open questions
+
+- §50 (reader app A/B/C) — neither; option D above.
+- §247 multi-tenancy — single global agent + per-user inputs.
+- §247 KB backfill verbatim acceptable — yes, with the personal-finance
+  filter above.
+
+Still open (Tim to answer directly in the SPEC):
+
+- Domain / brand: "Sentinel" final?
 - Anthropic API key: use Tim's existing one or provision a new one
   scoped to Sentinel for cost attribution?
 
