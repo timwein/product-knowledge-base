@@ -339,18 +339,37 @@ This minimizes the rewrite to the existing system prompt: file paths
 change (add user_id prefix), the remote URL changes, but the file-
 discipline / incremental-commit / dedupe-log machinery is preserved.
 
+### Brand
+
+**"Sentinel"** is the working brand for v1. Final for now — revisit before
+public launch if a better name surfaces.
+
+### Anthropic credentials
+
+Two distinct credential lanes — keep them separate:
+
+- **Claude Code chat sessions** (this session, and future ones used to
+  build Sentinel) — billed against Tim's Max plan. **No `ANTHROPIC_API_KEY`
+  needed** in the Claude Code web environment. Max plan covers chat usage.
+- **Sentinel curator runtime** (the deployed Python service that creates
+  Managed Agent sessions per user, and the one-time `setup.py` invocation
+  that calls `agents.create()` to provision Sentinel's agent) — uses a
+  **fresh `ANTHROPIC_API_KEY` provisioned specifically for Sentinel** so
+  curator costs are attributable to Sentinel, not Tim's personal usage.
+  Stored in Railway/Fly secret manager and on the setup machine's env.
+  Never in chat, repo, or commits.
+
 ### Resolved open questions
 
-- §50 (reader app A/B/C) — neither; option D above.
+All four open questions from v0.1 are resolved by §"Locked decisions
+(session 2)":
+
+- §50 (reader app A/B/C) — neither; new reader built fresh in `sentinel/web/`.
 - §247 multi-tenancy — single global agent + per-user inputs.
 - §247 KB backfill verbatim acceptable — yes, with the personal-finance
   filter above.
-
-Still open (Tim to answer directly in the SPEC):
-
-- Domain / brand: "Sentinel" final?
-- Anthropic API key: use Tim's existing one or provision a new one
-  scoped to Sentinel for cost attribution?
+- §247 brand — "Sentinel" final for now.
+- §247 Anthropic API key — fresh key for the deployed curator only.
 
 ## Branch
 
