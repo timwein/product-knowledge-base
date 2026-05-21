@@ -1,0 +1,35 @@
+[project]
+name = "sentinel-curator"
+version = "0.1.0"
+description = "Sentinel — multi-tenant blog knowledge base curator"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "asyncpg>=0.30.0",
+    "anthropic>=0.40.0",
+    "apscheduler>=3.10.0",
+    "httpx>=0.27.0",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.7",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sentinel_curator*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

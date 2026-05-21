@@ -1,0 +1,147 @@
+# Sentinel seed corpus — AI & Frontier Technology
+#
+# Ported from Tim's existing kb-blog-curator subscriptions.md +
+# url_sources.json. v0.1 cut — ~30 high-signal publications across the
+# topics from the canonical taxonomy. Full ~85-publication port happens
+# during the M3 onboarding-wizard milestone after we validate the schema
+# end-to-end.
+#
+# Topic slugs match the canonical taxonomy used by the agent's structured
+# analyses (see tweet-knowledge-base/topics/*.md).
+
+slug: ai
+name: AI & Frontier Technology
+description: |
+  Long-form blog and Substack content on frontier AI capabilities and
+  economics, agent architecture and reliability, AI labor economics,
+  Anthropic platform strategy, AI governance, and adjacent technical and
+  macro-strategic content.
+
+sources:
+  # --- AI capabilities, research, agents -------------------------------
+  - url: https://www.anthropic.com/research
+    title: Anthropic Research
+    topics: [ai-safety-alignment, claude-managed-agents, anthropic-platform-strategy]
+  - url: https://www.anthropic.com/news
+    title: Anthropic News
+    topics: [anthropic-platform-strategy, claude-code-features]
+  - url: https://www.interconnects.ai/
+    feed_url: https://www.interconnects.ai/feed
+    title: Interconnects
+    topics: [rl-environments, verification-and-evaluation, compute-and-scaling]
+  - url: https://simonwillison.net/
+    feed_url: https://simonwillison.net/atom/everything/
+    title: Simon Willison's Weblog
+    topics: [agent-infrastructure, claude-code-features]
+  - url: https://importai.substack.com/
+    feed_url: https://importai.substack.com/feed
+    title: Import AI
+    topics: [ai-safety-alignment, ai-governance, compute-and-scaling]
+  - url: https://thezvi.substack.com/
+    feed_url: https://thezvi.substack.com/feed
+    title: Don't Worry About the Vase
+    topics: [ai-safety-alignment, ai-governance, claude-managed-agents]
+  - url: https://www.transformernews.ai/
+    feed_url: https://www.transformernews.ai/feed
+    title: Transformer
+    topics: [ai-safety-alignment, ai-governance]
+  - url: https://www.hyperdimensional.co/
+    feed_url: https://www.hyperdimensional.co/feed
+    title: Hyperdimensional
+    topics: [recursive-self-improvement, ai-governance, verification-and-evaluation]
+  - url: https://frontierai.substack.com/
+    feed_url: https://frontierai.substack.com/feed
+    title: The AI Frontier
+    topics: [verification-and-evaluation, agent-infrastructure]
+  - url: https://magazine.sebastianraschka.com/
+    feed_url: https://magazine.sebastianraschka.com/feed
+    title: Ahead of AI
+    topics: [compute-and-scaling, verification-and-evaluation]
+  - url: https://www.latent.space/
+    feed_url: https://www.latent.space/feed
+    title: Latent Space
+    topics: [agent-infrastructure, rl-environments, ai-product-management]
+  - url: https://natesnewsletter.substack.com/
+    feed_url: https://natesnewsletter.substack.com/feed
+    title: Nate's Newsletter
+    topics: [anthropic-platform-strategy, claude-managed-agents, platform-risk]
+  - url: https://claudescorner.substack.com/
+    feed_url: https://claudescorner.substack.com/feed
+    title: Claude's Corner
+    topics: [claude-code-features, claude-managed-agents]
+  - url: https://aifutures1.substack.com/
+    feed_url: https://aifutures1.substack.com/feed
+    title: The AI Futures Project
+    topics: [recursive-self-improvement, ai-safety-alignment]
+
+  # --- Labor economics, macro strategy ---------------------------------
+  - url: https://www.exponentialview.co/
+    feed_url: https://www.exponentialview.co/feed
+    title: Exponential View
+    topics: [ai-labor-economics, compute-and-scaling, ai-governance]
+  - url: https://www.understandingai.org/
+    feed_url: https://www.understandingai.org/feed
+    title: Understanding AI
+    topics: [ai-labor-economics, ai-product-management]
+  - url: https://www.thealgorithmicbridge.com/
+    feed_url: https://www.thealgorithmicbridge.com/feed
+    title: The Algorithmic Bridge
+    topics: [ai-labor-economics, ai-product-management]
+  - url: https://artificialintelligencemadesimple.substack.com/
+    feed_url: https://artificialintelligencemadesimple.substack.com/feed
+    title: Artificial Intelligence Made Simple
+    topics: [ai-labor-economics, agent-infrastructure]
+
+  # --- Platform / compute / business strategy --------------------------
+  - url: https://stratechery.com/
+    feed_url: https://stratechery.com/feed/
+    title: Stratechery
+    topics: [platform-risk, anthropic-platform-strategy, ai-product-management]
+  - url: https://semianalysis.com/
+    feed_url: https://semianalysis.com/feed/
+    title: SemiAnalysis
+    topics: [compute-and-scaling, platform-risk]
+  - url: https://newsletter.pragmaticengineer.com/
+    feed_url: https://newsletter.pragmaticengineer.com/feed
+    title: The Pragmatic Engineer
+    topics: [agent-infrastructure, ai-product-management]
+  - url: https://every.to/
+    feed_url: https://every.to/feed.xml
+    title: Every
+    topics: [ai-product-management, ai-labor-economics]
+  - url: https://www.dwarkesh.com/
+    feed_url: https://www.dwarkesh.com/feed
+    title: Dwarkesh Patel
+    topics: [compute-and-scaling, recursive-self-improvement, ai-labor-economics]
+
+  # --- Defense, space, biotech (Tim's adjacent investing themes) -------
+  - url: https://www.ashleevance.com/
+    feed_url: https://www.ashleevance.com/feed
+    title: Core Memory
+    topics: [robotics-and-embodiment]
+  - url: https://payloadspace.com/
+    feed_url: https://payloadspace.com/feed/
+    title: Payload Space
+    topics: [robotics-and-embodiment]
+  - url: https://press.asimov.com/
+    feed_url: https://press.asimov.com/feed
+    title: Asimov Press
+    topics: [biotech-regulatory-innovation, neuroscience-and-ai]
+
+  # --- LessWrong / Alignment Forum (high-signal community) -------------
+  - url: https://www.lesswrong.com/
+    feed_url: https://www.lesswrong.com/feed.xml
+    title: LessWrong
+    topics: [ai-safety-alignment, recursive-self-improvement, ai-governance]
+  - url: https://www.alignmentforum.org/
+    feed_url: https://www.alignmentforum.org/feed.xml
+    title: AI Alignment Forum
+    topics: [ai-safety-alignment, recursive-self-improvement]
+
+  # --- Labs ------------------------------------------------------------
+  - url: https://openai.com/research
+    title: OpenAI Research
+    topics: [ai-safety-alignment, recursive-self-improvement, compute-and-scaling]
+  - url: https://deepmind.google/research/
+    title: Google DeepMind Research
+    topics: [ai-safety-alignment, recursive-self-improvement, compute-and-scaling]

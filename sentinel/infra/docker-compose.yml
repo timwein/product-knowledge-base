@@ -1,0 +1,25 @@
+# Local-dev Postgres + pgvector for Sentinel.
+# `docker compose up -d` from this directory boots a Postgres with the
+# Sentinel schema applied on first run.
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: sentinel-postgres
+    environment:
+      POSTGRES_USER: sentinel
+      POSTGRES_PASSWORD: sentinel_dev
+      POSTGRES_DB: sentinel
+    ports:
+      - "5432:5432"
+    volumes:
+      - sentinel_pgdata:/var/lib/postgresql/data
+      - ../curator/sentinel_curator/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sentinel -d sentinel"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  sentinel_pgdata:
