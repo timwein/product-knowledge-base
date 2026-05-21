@@ -1,8 +1,24 @@
 # Sentinel — Build Spec (v0.1)
 
 Session handoff doc. All decisions below were made in a prior planning session.
-The other session has access to the source repos for Tim's existing blog
-knowledge base (managed agent + system prompts + seed corpus + KB data).
+
+## Source repos (all on GitHub under `timwein/`)
+
+The existing knowledge base is split across three repos. The next session
+needs read access to all of them (add to GitHub MCP scope):
+
+- **`tweet-knowledge-base`** — the current KB. Contains analyzed posts that
+  will be copied verbatim as backfill for new Sentinel users, plus the seed
+  corpus of blogs.
+- **`blog-ingestion-agent`** — the curator we are reusing. Contains the
+  Managed Agent definition, system prompts (especially the
+  structured-analysis prompt), tools, and any scoring/discovery logic.
+- **`saved-tweet-ingestion-agent`** — sibling agent for tweets. Not used by
+  Sentinel v1 (blogs only), but read it for context if anything in
+  `blog-ingestion-agent` references shared patterns.
+
+**Sentinel itself is built in `product-knowledge-base`** (this repo) on
+branch `claude/verify-claude-max-usage-OvBIf`.
 
 ## Product summary
 
@@ -151,24 +167,31 @@ sentinel/
 ## What the next session needs to do first
 
 **Before writing any curator code or finalizing the `posts.structured_analysis`
-schema**, read these from the other repos (which the next session has
-access to):
+schema**, read the following from the three source repos:
 
-1. **Managed Agent definition** for Tim's blog-ingestion agent — model,
-   tools, system prompt(s), any agent config.
+From **`blog-ingestion-agent`**:
+1. **Managed Agent definition** — model, tools, system prompt(s), agent config.
 2. **Structured-analysis system prompt** — this defines the schema of
    `posts.structured_analysis` in Sentinel's DB.
-3. **Sample structured-analysis outputs** — 2–3 real post analyses, to
+3. **How the agent is invoked today** — API call shape, auth, expected
+   inputs, expected output schema, latency, cost per call.
+4. **Discovery / scoring logic** — anything outside the agent itself that
+   contributes to ranking or new-source suggestions.
+
+From **`tweet-knowledge-base`**:
+5. **Sample structured-analysis outputs** — 2–3 real post analyses, to
    confirm the actual shape (prompts and outputs sometimes drift).
-4. **Existing seed corpus** — the list of blogs + topics + any
+6. **Existing seed corpus** — the list of blogs + topics + any
    per-source metadata, to port into `sentinel/seed-corpora/ai.yaml`.
-5. **Existing KB data** — the analyzed posts that get copied verbatim
+7. **Existing KB data** — the analyzed posts that get copied verbatim
    as backfill for new users. Need to know:
-   - storage format (JSONL? Postgres dump? S3?)
+   - storage format (JSONL? Postgres dump? files in the repo?)
    - how many posts exist
    - whether posts include extracted full text or only analysis
-6. **How the agent is invoked today** — API call shape, auth, expected
-   inputs, expected output schema, latency, cost per call.
+
+From **`saved-tweet-ingestion-agent`** (context only):
+8. Skim to see if it shares any infrastructure with `blog-ingestion-agent`
+   that Sentinel should also reuse. Not load-bearing for v1.
 
 Once those are read, the next session should:
 
