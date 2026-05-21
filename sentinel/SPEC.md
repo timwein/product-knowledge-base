@@ -20,6 +20,49 @@ needs read access to all of them (add to GitHub MCP scope):
 **Sentinel itself is built in `product-knowledge-base`** (this repo) on
 branch `claude/verify-claude-max-usage-OvBIf`.
 
+## Component inventory
+
+Components that make up the existing KB project, and where each one lives.
+Sentinel v1 only uses a subset (see "Scope" note below).
+
+| # | Component | Repo | Key files |
+|---|---|---|---|
+| 1 | Bookmarker agent (fetches X bookmarks) | `saved-tweet-ingestion-agent` | `run_bookmarker.py`, `lib/bookmarker.py`, `lib/bookmark_prompts.py`, `setup_bookmarker.py`, `com.timwein.tweet-bookmarker.plist` |
+| 2 | Tweet ingestion agent | `saved-tweet-ingestion-agent` | `run.py`, `setup.py`, `lib/prompts.py`, `lib/fetcher.py`, `lib/feed_fetcher.py` |
+| 3 | Blog ingestion agent | `blog-ingestion-agent` | `run.py`, `setup.py`, `blog-ingest.yml`, `kb-blog-curator.system.md` |
+| 4 | Podcast ingestion agent | `blog-ingestion-agent` | `podcast-run.py`, `podcast-setup.py`, `podcast-ingest.yml`, `kb-podcast-curator.system.md` |
+| 5 | Vercel reader app (Next.js) | `tweet-knowledge-base` | `reader/app/**`, `reader/components/**`, `reader/app/api/{analyze,chat,rate,reads,revalidate}/route.ts` |
+| 6 | Structured analysis prompts | split across ingestion repos | Tweet bookmark: `saved-tweet-ingestion-agent/lib/bookmark_prompts.py` • Tweet ingest: `saved-tweet-ingestion-agent/lib/prompts.py` • Blog: `blog-ingestion-agent/kb-blog-curator.system.md` • Podcast: `blog-ingestion-agent/kb-podcast-curator.system.md` |
+
+### Scope: what Sentinel v1 uses vs. defers
+
+- **Use in v1:** #3 (blog ingestion agent), #6 (blog prompt only), and #5
+  (reader app) — Sentinel's web app should start by reading the existing
+  Next.js reader in `tweet-knowledge-base/reader/` and deciding whether to
+  fork/extend it in-place, port it into `sentinel/web/`, or rebuild. The
+  existing reader has API routes (`analyze`, `chat`, `rate`, `reads`,
+  `revalidate`) that likely cover features we'd otherwise reinvent.
+- **Defer to v2:** #1 tweet bookmarker, #2 tweet ingestion, #4 podcast
+  ingestion. Sentinel v1 is blogs-only by prior decision. But the
+  multi-source architecture should leave room for these to plug in later
+  — `sources.kind` already allows non-blog values in the data model.
+
+### Open question raised by this inventory
+
+The decision to "build Sentinel's web app in `sentinel/web/`" assumed there
+was no existing reader. There is. **Before scaffolding the Next.js app,
+the next session should read `tweet-knowledge-base/reader/` and propose
+one of:**
+  - **A.** Fork the existing reader into `sentinel/web/` and adapt it for
+    multi-tenant + Clerk + the new data model. Probably fastest.
+  - **B.** Productionize the reader in place inside `tweet-knowledge-base`
+    and make `product-knowledge-base` the home only for new services
+    (Python curator, infra, migrations). Cleaner separation but more repos
+    to coordinate.
+  - **C.** Rebuild from scratch in `sentinel/web/` because the existing
+    reader is too coupled to the single-user/tweet model to retrofit
+    cleanly. Slowest, only if A and B are both bad.
+
 ## Product summary
 
 Sentinel is a personal blog knowledge base. A user signs up, picks
