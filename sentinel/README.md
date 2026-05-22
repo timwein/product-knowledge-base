@@ -126,17 +126,51 @@ Per [`SPEC.md`](./SPEC.md) §"Anthropic credentials":
   machine) — uses a fresh `ANTHROPIC_API_KEY` provisioned specifically
   for Sentinel, for cost attribution. Never in chat or commits.
 
-## What's next (M1)
+## M1 progress
 
-1. Personal-finance scanner over the 468 existing analyses — **done**.
-   See `backfill/personal-finance-candidates.md` for the drop list (Tim
-   reviews + strikes through any he wants kept).
-2. RSS fetch + readability extraction (`curator/sentinel_curator/fetch.py`).
-3. Seed-corpus loader: read `seed-corpora/ai.yaml`, upsert into `sources`
-   + `seed_corpora` + `seed_corpus_sources`.
-4. Backfill parser: turn each cleared `blog-*.md` into rows in `posts` +
-   `user_post_scores` (verbatim per user at signup).
-5. Minimal feed UI on the web side (chronological, unranked).
+1. **Done** — Personal-finance scanner. See
+   `backfill/personal-finance-candidates.md` for the 23 Tier-1 + 88
+   Tier-2 drop candidates. Tim eyeballs and strikes through any heading
+   he wants kept (`~~### path~~`).
+2. **Done** — Backfill parser
+   (`curator/sentinel_curator/backfill.py`,
+   `scripts/parse_backfill.py`). Produces
+   `backfill/posts.jsonl` (357 cleared analyses, JSON per line).
+3. **Done** — Seed-corpus loader
+   (`curator/sentinel_curator/seed_loader.py`,
+   `scripts/load_seed_corpus.py`). Reads `seed-corpora/ai.yaml`, upserts
+   `seed_corpora` + `sources` + `seed_corpus_sources`. Idempotent.
+4. **Done** — Backfill loader
+   (`curator/sentinel_curator/backfill_loader.py`,
+   `scripts/load_backfill_posts.py`). Loads `posts.jsonl` into the
+   global `posts` table; dedupes on URL keeping the latest
+   ingested_at. Per-user `user_post_scores` are applied at signup via
+   `apply_backfill_to_user(conn, user_id)`.
+5. **Todo** — RSS fetch + readability extraction
+   (`curator/sentinel_curator/fetch.py`).
+6. **Todo** — Minimal feed UI on the web side (chronological, unranked).
+   Needs DB + Clerk live (M0 deploy gates).
+
+## Loading the DB (after M0 deploy)
+
+Once Neon is up and schema is applied:
+
+```sh
+cd sentinel/curator
+source .venv/bin/activate
+export DATABASE_URL=<your-neon-connection-string>
+
+# 1. Seed corpora
+python ../scripts/load_seed_corpus.py ../seed-corpora/ai.yaml
+
+# 2. Backfill the cleared analyses (after Tim reviews the drop list)
+python ../scripts/parse_backfill.py /path/to/tweet-knowledge-base  # if not already done
+python ../scripts/load_backfill_posts.py
+```
+
+After both loads run, the DB has ~30 sources + 357 posts globally.
+`apply_backfill_to_user` is called per new-user signup to populate their
+`user_post_scores` rows.
 
 M2 — wire up the Managed Agent (genericize Tim's
 `kb-blog-curator.system.md` for multi-tenant use, build the staging-git
