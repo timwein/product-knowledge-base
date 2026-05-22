@@ -128,11 +128,15 @@ Per [`SPEC.md`](./SPEC.md) §"Anthropic credentials":
 
 ## What's next (M1)
 
-1. RSS fetch + readability extraction (`curator/sentinel_curator/fetch.py`).
-2. Seed-corpus loader: read `seed-corpora/ai.yaml`, upsert into `sources`
+1. Personal-finance scanner over the 468 existing analyses — **done**.
+   See `backfill/personal-finance-candidates.md` for the drop list (Tim
+   reviews + strikes through any he wants kept).
+2. RSS fetch + readability extraction (`curator/sentinel_curator/fetch.py`).
+3. Seed-corpus loader: read `seed-corpora/ai.yaml`, upsert into `sources`
    + `seed_corpora` + `seed_corpus_sources`.
-3. Backfill of the 468 existing analyses (with personal-finance filter).
-4. Minimal feed UI on the web side (chronological, unranked).
+4. Backfill parser: turn each cleared `blog-*.md` into rows in `posts` +
+   `user_post_scores` (verbatim per user at signup).
+5. Minimal feed UI on the web side (chronological, unranked).
 
 M2 — wire up the Managed Agent (genericize Tim's
 `kb-blog-curator.system.md` for multi-tenant use, build the staging-git
